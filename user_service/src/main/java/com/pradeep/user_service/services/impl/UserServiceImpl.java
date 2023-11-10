@@ -4,6 +4,8 @@ import com.pradeep.user_service.entities.Hotel;
 import com.pradeep.user_service.entities.Rating;
 import com.pradeep.user_service.entities.User;
 import com.pradeep.user_service.exception.ResourceNotFoundException;
+import com.pradeep.user_service.external_services.HotelService;
+import com.pradeep.user_service.external_services.RatingService;
 import com.pradeep.user_service.repository.UserRepository;
 import com.pradeep.user_service.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,11 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private HotelService hotelService;
+
+    @Autowired
+    private RatingService ratingService;
 
     @Autowired
     UserServiceImpl(UserRepository repository) {
@@ -49,20 +56,20 @@ public class UserServiceImpl implements UserService {
         //fetch ratings from rating service
         //https://localhost:8083/ratings/user/506482af-9a02-4af0-b101-6a1e9da9142c
 
-       Rating[] ratingsOfUser = restTemplate.
-                getForObject(
-                        "http://localhost:8083/ratings/user/" + user.getUserId(),
-                        Rating[].class);
+//       Rating[] ratingsOfUser = restTemplate.
+//                getForObject(
+//                        "http://RATING-SERVICE/ratings/user/" + user.getUserId(),
+//                        Rating[].class);
 
-        List<Rating> ratings = Arrays.stream(ratingsOfUser).toList();
+        List<Rating> ratings = Arrays.stream(ratingService.getRatings(user.getUserId())).toList();
 
         List<Rating> ratingList=ratings.stream().map(rating -> {
             //api call
-            ResponseEntity<Hotel> forEntity=restTemplate.getForEntity(
-                    "http://localhost:8082/hotels/"+rating.getHotelId(),
-                    Hotel.class
-            );
-            Hotel hotel=forEntity.getBody();
+//            ResponseEntity<Hotel> forEntity=restTemplate.getForEntity(
+//                    "http://HOTEL-SERVICE/hotels/"+rating.getHotelId(),
+//                    Hotel.class
+//            );
+            Hotel hotel=hotelService.getHotel(rating.getHotelId());
             rating.setHotel(hotel);
            return rating;
         }).collect(Collectors.toList());
