@@ -11,18 +11,21 @@ spring:
     password: root
     driver-class-name: org.postgresql.Driver
 
+  config:
+    import: configserver:http://localhost:8084
+
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
 
 
-eureka:
-  client:
-    fetch-registry: true
-    register-with-eureka: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-  instance:
-    prefer-ip-address: true
+#eureka:
+#  client:
+#    fetch-registry: true
+#    register-with-eureka: true
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka
+#  instance:
+#    prefer-ip-address: true
 
